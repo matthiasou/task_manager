@@ -257,26 +257,40 @@ class DbHandler {
         }
     }
 
-    /**
-     * Fetching all user tasks
-     * @param String $user_id id of the user
-     */
-    public function getAllUserTasks($user_id) {
-        $stmt = $this->conn->prepare("SELECT t.* FROM tasks t, user_tasks ut WHERE t.id = ut.task_id AND ut.user_id = ?");
-        $stmt->bind_param("i", $user_id);
-        $stmt->execute();
-        $tasks = $stmt->get_result();
-        $stmt->close();
-        return $tasks;
-    }
+    
 
     public function getAllUsers() {
         $stmt = $this->conn->prepare("SELECT * FROM users");
         //$stmt->bind_param("i", $user_id);
         $stmt->execute();
-        $tasks = $stmt->get_result();
+        $users = $stmt->get_result();
         $stmt->close();
-        return $tasks;
+        return $users;
+    }
+
+    public function getUserById($id) {
+        $stmt = $this->conn->prepare("SELECT id,name,email FROM users WHERE id=?");
+        $stmt->bind_param("i", $id);
+        if ($stmt->execute()) {
+            $res = array();
+            $stmt->bind_result($id, $name, $email);
+            
+            $stmt->fetch();
+            $res["id"] = $id;
+            $res["name"] = $name;
+            $res["email"] = $email;
+            $stmt->close();
+            return $res;
+        }
+        else {
+            return NULL;
+        }
+
+/*
+        $stmt->execute();
+        $user = $stmt->get_result();
+        $stmt->close();
+        return $user;*/
     }
 
     /**
@@ -285,9 +299,19 @@ class DbHandler {
      * @param String $task task text
      * @param String $status task status
      */
+    /*
     public function updateTask($user_id, $task_id, $task, $status) {
         $stmt = $this->conn->prepare("UPDATE tasks t, user_tasks ut set t.task = ?, t.status = ? WHERE t.id = ? AND t.id = ut.task_id AND ut.user_id = ?");
         $stmt->bind_param("siii", $task, $status, $task_id, $user_id);
+        $stmt->execute();
+        $num_affected_rows = $stmt->affected_rows;
+        $stmt->close();
+        return $num_affected_rows > 0;
+    }*/
+
+     public function updateUser($id, $name, $email){
+        $stmt = $this->conn->prepare("UPDATE users set name = ?, email = ? WHERE id = ?");
+        $stmt->bind_param("ssi", $name, $email, $id);
         $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();
@@ -298,10 +322,21 @@ class DbHandler {
      * Deleting a task
      * @param String $task_id id of the task to delete
      */
+    /*
     public function deleteTask($user_id, $task_id) {
         $stmt = $this->conn->prepare("DELETE t FROM tasks t, user_tasks ut WHERE t.id = ? AND ut.task_id = t.id AND ut.user_id = ?");
         $stmt->bind_param("ii", $task_id, $user_id);
-        $stmt->execute(); 
+        $stmt->execute();
+        $num_affected_rows = $stmt->affected_rows;
+        $stmt->close();
+        return $num_affected_rows > 0;
+    }
+    */
+
+    public function deleteUser($id) {
+        $stmt = $this->conn->prepare("DELETE FROM users WHERE id= ?");
+        $stmt->bind_param("i", $id);
+        $stmt->execute();
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();
         return $num_affected_rows > 0;

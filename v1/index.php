@@ -132,7 +132,7 @@ $app->post('/login', function() use ($app) {
 
 
 /**
- * Listing all users 
+ * Listing all users
  * method GET
  * url /users
  */
@@ -153,7 +153,6 @@ $app->get('/users', function() {
                 $tmp["id"] = $users["id"];
                 $tmp["name"] = $users["name"];
                 $tmp["email"] = $users["email"];
-
                 array_push($response["users"], $tmp);
             }
 
@@ -199,6 +198,7 @@ $app->get('/tasks', 'authenticate', function() {
  * url /tasks/:id
  * Will return 404 if the task doesn't belongs to user
  */
+/*
 $app->get('/tasks/:id', 'authenticate', function($task_id) {
             global $user_id;
             $response = array();
@@ -213,6 +213,25 @@ $app->get('/tasks/:id', 'authenticate', function($task_id) {
                 $response["task"] = $result["task"];
                 $response["status"] = $result["status"];
                 $response["createdAt"] = $result["created_at"];
+                echoRespnse(200, $response);
+            } else {
+                $response["error"] = true;
+                $response["message"] = "The requested resource doesn't exists";
+                echoRespnse(404, $response);
+            }
+        });
+*/
+$app->get('/user/:id', function($id) {
+            //global $user_id;
+            $response = array();
+            $db = new DbHandler();
+
+            $result = $db->getUserById($id);
+            if ($result != NULL) {
+                $response["error"] = false;
+                $response['id'] = $result['id'];
+                $response["name"] = $result["name"];
+                $response["email"] = $result["email"];
                 echoRespnse(200, $response);
             } else {
                 $response["error"] = true;
@@ -258,6 +277,7 @@ $app->post('/tasks', 'authenticate', function() use ($app) {
  * params task, status
  * url - /tasks/:id
  */
+/*
 $app->put('/tasks/:id', 'authenticate', function($task_id) use($app) {
             // check for required params
             verifyRequiredParams(array('task', 'status'));
@@ -282,18 +302,43 @@ $app->put('/tasks/:id', 'authenticate', function($task_id) use($app) {
             }
             echoRespnse(200, $response);
         });
+        */
+$app->put('/users/:id',function($id) use($app) {
+            // check for required params
+            //verifyRequiredParams(array('name', 'email'));
+            //global $user_id;           
+            $name = $app->request->put('name');
+            $email = $app->request->put('email');
+            
+            $db = new DbHandler();
+            $response = array();
+
+            // updating task
+            $result = $db->updateUser($id, $name, $email);
+            if ($result) {
+                // task updated successfully
+                $response["error"] = false;
+                $response["message"] = "User updated successfully";
+            } else {
+                // task failed to update
+                $response["error"] = true;
+                $response["message"] = "User failed to update. Please try again!";
+            }
+            echoRespnse(200, $response);
+        });
+
 
 /**
  * Deleting task. Users can delete only their tasks
  * method DELETE
  * url /tasks
  */
-$app->delete('/tasks/:id', 'authenticate', function($task_id) use($app) {
-            global $user_id;
+$app->delete('/users/:id',function($id) use($app) {
+            //global $user_id;
 
             $db = new DbHandler();
             $response = array();
-            $result = $db->deleteTask($user_id, $task_id);
+            $result = $db->deleteUser($id);
             if ($result) {
                 // task deleted successfully
                 $response["error"] = false;
