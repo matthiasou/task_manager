@@ -132,7 +132,7 @@ $app->post('/login', function() use ($app) {
 
 
 /**
- * Listing all users
+ * Listing all users 
  * method GET
  * url /users
  */

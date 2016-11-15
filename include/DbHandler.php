@@ -301,7 +301,7 @@ class DbHandler {
     public function deleteTask($user_id, $task_id) {
         $stmt = $this->conn->prepare("DELETE t FROM tasks t, user_tasks ut WHERE t.id = ? AND ut.task_id = t.id AND ut.user_id = ?");
         $stmt->bind_param("ii", $task_id, $user_id);
-        $stmt->execute();
+        $stmt->execute(); 
         $num_affected_rows = $stmt->affected_rows;
         $stmt->close();
         return $num_affected_rows > 0;
