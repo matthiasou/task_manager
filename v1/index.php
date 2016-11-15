@@ -152,6 +152,8 @@ $app->get('/users', function() {
                 $tmp = array();
                 $tmp["id"] = $users["id"];
                 $tmp["name"] = $users["name"];
+                $tmp["email"] = $users["email"];
+
                 array_push($response["users"], $tmp);
             }
 
